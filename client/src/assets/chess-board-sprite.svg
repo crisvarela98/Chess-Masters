@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="80" viewBox="0 0 160 80">
+  <defs>
+    <pattern id="grain" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.6" fill="#000" opacity="0.06" />
+      <circle cx="6.5" cy="3.5" r="0.6" fill="#fff" opacity="0.08" />
+      <circle cx="3.5" cy="6.5" r="0.5" fill="#000" opacity="0.05" />
+    </pattern>
+    <linearGradient id="lightGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e7cbab" />
+      <stop offset="100%" stop-color="#d6b38a" />
+    </linearGradient>
+    <linearGradient id="darkGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#a57850" />
+      <stop offset="100%" stop-color="#8a613f" />
+    </linearGradient>
+  </defs>
+
+  <g>
+    <rect x="0" y="0" width="80" height="80" fill="url(#lightGrad)" />
+    <rect x="0" y="0" width="80" height="80" fill="url(#grain)" />
+    <rect x="0.5" y="0.5" width="79" height="79" fill="none" stroke="#fff" opacity="0.18" />
+  </g>
+
+  <g>
+    <rect x="80" y="0" width="80" height="80" fill="url(#darkGrad)" />
+    <rect x="80" y="0" width="80" height="80" fill="url(#grain)" />
+    <rect x="80.5" y="0.5" width="79" height="79" fill="none" stroke="#000" opacity="0.14" />
+  </g>
+</svg>

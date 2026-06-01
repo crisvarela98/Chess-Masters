@@ -1,5 +1,13 @@
 export default function registerGameSockets(io) {
+  const onlineUsers = new Map();
+
   io.on("connection", (socket) => {
+    socket.on("userOnline", ({ username }) => {
+      if (!username) return;
+      onlineUsers.set(socket.id, username);
+      io.emit("userList", Array.from(onlineUsers.values()));
+    });
+
     socket.on("createRoom", ({ roomId, player }) => {
       socket.join(roomId);
       socket.emit("roomCreated", { roomId, player });
@@ -20,6 +28,8 @@ export default function registerGameSockets(io) {
     });
 
     socket.on("disconnect", () => {
+      onlineUsers.delete(socket.id);
+      io.emit("userList", Array.from(onlineUsers.values()));
       socket.broadcast.emit("playerDisconnected", { socketId: socket.id });
     });
   });

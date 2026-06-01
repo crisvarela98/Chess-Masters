@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import express from "express";
 import http from "http";
 import mongoose from "mongoose";
+import path from "path";
 import { Server } from "socket.io";
+import { fileURLToPath } from "url";
+import authRoutes from "./routes/auth.js";
 import matchRoutes from "./routes/matches.js";
 import missionRoutes from "./routes/missions.js";
 import tacticRoutes from "./routes/tactics.js";
@@ -11,7 +14,9 @@ import tournamentRoutes from "./routes/tournaments.js";
 import userRoutes from "./routes/users.js";
 import registerGameSockets from "./sockets/gameSocket.js";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 const server = http.createServer(app);
@@ -25,6 +30,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, name: "CHESS MASTERS API" });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/tactics", tacticRoutes);
 app.use("/api/missions", missionRoutes);

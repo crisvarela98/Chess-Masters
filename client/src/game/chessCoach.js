@@ -14,9 +14,28 @@ export function getCoachAdvice(game, lastMove) {
   return "Mejora una pieza y controla el centro.";
 }
 
-export function pickAiMove(game) {
+export function pickAiMove(game, strength = 2) {
   const moves = game.moves({ verbose: true });
+  if (!moves.length) return null;
+
   const captures = moves.filter((move) => move.captured);
-  const pool = captures.length ? captures : moves;
-  return pool[Math.floor(Math.random() * pool.length)];
+  const checks = moves.filter((move) => move.san.includes("+") || move.san.includes("#"));
+  const center = moves.filter((move) => ["d4", "d5", "e4", "e5", "c4", "f4"].includes(move.to));
+  const weighted = [];
+
+  moves.forEach((move) => weighted.push(move));
+  center.forEach((move) => weighted.push(move));
+  captures.forEach((move) => weighted.push(move, move));
+  checks.forEach((move) => weighted.push(move, move, move));
+
+  if (strength <= 1) {
+    return moves[Math.floor(Math.random() * moves.length)];
+  }
+
+  if (strength <= 3) {
+    const pool = captures.length ? captures : weighted;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  return weighted[Math.floor(Math.random() * weighted.length)];
 }

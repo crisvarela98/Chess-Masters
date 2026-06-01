@@ -1,16 +1,9 @@
 import { Chess } from "chess.js";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Lightbulb, Pause, RotateCcw, ShieldAlert } from "lucide-react";
 import { getCoachAdvice, pickAiMove } from "./chessCoach.js";
 
-const pieceMap = {
-  p: { w: "P", b: "p" },
-  r: { w: "R", b: "r" },
-  n: { w: "N", b: "n" },
-  b: { w: "B", b: "b" },
-  q: { w: "Q", b: "q" },
-  k: { w: "K", b: "k" }
-};
+const pieceTypeClass = { p: "pawn", r: "rook", n: "knight", b: "bishop", q: "queen", k: "king" };
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
@@ -18,7 +11,17 @@ function squareName(row, col) {
   return `${files[col]}${8 - row}`;
 }
 
-export default function ChessBoard({ compact = false }) {
+export default function ChessBoard({
+  compact = false,
+  aiStrength = 2,
+  playerName = "Cristian",
+  opponentName = "AlexG195",
+  mode = "ai",
+  socket = null,
+  roomId = "",
+  isWhite = true,
+  onMatchComplete
+}) {
   const [game, setGame] = useState(() => new Chess());
   const [selected, setSelected] = useState(null);
   const [history, setHistory] = useState([]);
@@ -33,6 +36,8 @@ export default function ChessBoard({ compact = false }) {
 
   const board = game.board();
   const coach = getCoachAdvice(game, lastMove);
+  const myColor = isWhite ? "w" : "b";
+  const canPlayColor = game.turn() === myColor;
 
   function refresh(nextGame, nextHistory) {
     setGame(nextGame);
@@ -42,7 +47,7 @@ export default function ChessBoard({ compact = false }) {
 
   function makeAiMove(nextGame, nextHistory) {
     if (nextGame.isGameOver()) return;
-    const aiMove = pickAiMove(nextGame);
+    const aiMove = pickAiMove(nextGame, aiStrength);
     if (!aiMove) return;
     const played = nextGame.move({ from: aiMove.from, to: aiMove.to, promotion: "q" });
     const updated = [...nextHistory, played];
@@ -51,11 +56,44 @@ export default function ChessBoard({ compact = false }) {
     refresh(nextGame, updated);
   }
 
+  function finishIfNeeded(nextGame) {
+    if (!nextGame.isGameOver()) return;
+    const winner = nextGame.isCheckmate() ? (nextGame.turn() === "w" ? "black" : "white") : "draw";
+    if (onMatchComplete) onMatchComplete(winner);
+  }
+
+  useEffect(() => {
+    if (mode !== "online" || !socket) return undefined;
+
+    function onOpponentMove({ roomId: payloadRoom, move }) {
+      if (payloadRoom !== roomId || !move) return;
+      const nextGame = new Chess(game.fen());
+      const played = nextGame.move(move);
+      if (!played) return;
+      const nextHistory = [...history, played];
+      setLastMove(played);
+      setSelected(null);
+      setMessage("Turno propio.");
+      refresh(nextGame, nextHistory);
+      finishIfNeeded(nextGame);
+    }
+
+    socket.on("opponentMove", onOpponentMove);
+    return () => socket.off("opponentMove", onOpponentMove);
+  }, [socket, mode, roomId, game, history]);
+
+  useEffect(() => {
+    if (mode !== "online") return;
+    setMessage(canPlayColor ? "Tu turno." : "Turno rival.");
+  }, [mode, canPlayColor]);
+
   function handleSquareClick(square) {
     if (game.isGameOver()) return;
+    if (mode === "online" && !canPlayColor) return;
+
     const piece = game.get(square);
 
-    if (!selected && piece?.color === "w") {
+    if (!selected && piece?.color === game.turn()) {
       setSelected(square);
       setMessage("Elige una casilla iluminada.");
       return;
@@ -65,17 +103,23 @@ export default function ChessBoard({ compact = false }) {
       const nextGame = new Chess(game.fen());
       const played = nextGame.move({ from: selected, to: square, promotion: "q" });
       if (!played) {
-        setSelected(piece?.color === "w" ? square : null);
-        setMessage(piece?.color === "w" ? "Nueva pieza seleccionada." : "Movimiento no legal.");
+        setSelected(piece?.color === game.turn() ? square : null);
+        setMessage(piece?.color === game.turn() ? "Nueva pieza seleccionada." : "Movimiento no legal.");
         return;
       }
 
       const nextHistory = [...history, played];
       setSelected(null);
       setLastMove(played);
-      setMessage(played.san.includes("#") ? "Jaque mate. Victoria brillante." : "Buena jugada. La IA responde.");
+      setMessage(played.san.includes("#") ? "Jaque mate. Victoria brillante." : "Buena jugada.");
       refresh(nextGame, nextHistory);
-      window.setTimeout(() => makeAiMove(nextGame, nextHistory), 420);
+      finishIfNeeded(nextGame);
+
+      if (mode === "online" && socket && roomId) {
+        socket.emit("movePiece", { roomId, move: { from: played.from, to: played.to, promotion: "q" }, fen: nextGame.fen() });
+      } else {
+        window.setTimeout(() => makeAiMove(nextGame, nextHistory), 420);
+      }
     }
   }
 
@@ -91,8 +135,8 @@ export default function ChessBoard({ compact = false }) {
     <section className={`play-area ${compact ? "compact" : ""}`}>
       <div className="game-topbar">
         <div>
-          <strong>AlexG195</strong>
-          <span>1250</span>
+          <strong>{opponentName}</strong>
+          <span>{mode === "online" ? "En linea" : "IA nivel " + aiStrength}</span>
         </div>
         <div className="clock">08:45</div>
       </div>
@@ -114,7 +158,7 @@ export default function ChessBoard({ compact = false }) {
                 onClick={() => handleSquareClick(square)}
                 aria-label={square}
               >
-                {piece ? <span className={`piece ${piece.color}`}>{pieceMap[piece.type][piece.color]}</span> : null}
+                {piece ? <span className={`piece piece-sprite ${piece.color}-${pieceTypeClass[piece.type]}`} /> : null}
               </button>
             );
           })
@@ -123,8 +167,8 @@ export default function ChessBoard({ compact = false }) {
 
       <div className="game-topbar bottom">
         <div>
-          <strong>Cristian</strong>
-          <span>1260</span>
+          <strong>{playerName}</strong>
+          <span>Tu lado: {isWhite ? "Blancas" : "Negras"}</span>
         </div>
         <div className="clock">09:30</div>
       </div>

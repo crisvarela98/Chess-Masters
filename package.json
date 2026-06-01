@@ -5,7 +5,8 @@
   "description": "CHESS MASTERS mobile-first chess learning game.",
   "scripts": {
     "install-all": "npm install --prefix client && npm install --prefix server",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "npm run start",
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
     "seed": "npm run seed --prefix server"

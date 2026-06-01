@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
+    email: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
+    googleId: { type: String, unique: true, sparse: true },
+    authProvider: { type: String, enum: ["local", "google"], default: "local" },
+    passwordHash: { type: String, select: false },
     avatar: { type: String, default: "C" },
+    age: { type: Number, min: 6 },
     level: { type: Number, default: 1 },
     xp: { type: Number, default: 0 },
     coins: { type: Number, default: 0 },

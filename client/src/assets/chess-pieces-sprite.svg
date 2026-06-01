@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="160" viewBox="0 0 480 160">
+  <defs>
+    <radialGradient id="whiteBase" cx="35%" cy="28%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e4edf9" />
+    </radialGradient>
+    <radialGradient id="blackBase" cx="35%" cy="28%">
+      <stop offset="0%" stop-color="#2f4157" />
+      <stop offset="100%" stop-color="#0f1926" />
+    </radialGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-color="#000000" flood-opacity="0.28" />
+    </filter>
+    <style>
+      .glyph { font-family: Georgia, "Times New Roman", serif; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+    </style>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <circle cx="40" cy="40" r="34" fill="url(#whiteBase)" />
+    <circle cx="120" cy="40" r="34" fill="url(#whiteBase)" />
+    <circle cx="200" cy="40" r="34" fill="url(#whiteBase)" />
+    <circle cx="280" cy="40" r="34" fill="url(#whiteBase)" />
+    <circle cx="360" cy="40" r="34" fill="url(#whiteBase)" />
+    <circle cx="440" cy="40" r="34" fill="url(#whiteBase)" />
+
+    <circle cx="40" cy="120" r="34" fill="url(#blackBase)" />
+    <circle cx="120" cy="120" r="34" fill="url(#blackBase)" />
+    <circle cx="200" cy="120" r="34" fill="url(#blackBase)" />
+    <circle cx="280" cy="120" r="34" fill="url(#blackBase)" />
+    <circle cx="360" cy="120" r="34" fill="url(#blackBase)" />
+    <circle cx="440" cy="120" r="34" fill="url(#blackBase)" />
+  </g>
+
+  <g class="glyph" font-size="42" fill="#1c2a3a">
+    <text x="40" y="42">K</text>
+    <text x="120" y="42">Q</text>
+    <text x="200" y="42">R</text>
+    <text x="280" y="42">B</text>
+    <text x="360" y="42">N</text>
+    <text x="440" y="42">P</text>
+  </g>
+
+  <g class="glyph" font-size="42" fill="#f2f7ff">
+    <text x="40" y="122">K</text>
+    <text x="120" y="122">Q</text>
+    <text x="200" y="122">R</text>
+    <text x="280" y="122">B</text>
+    <text x="360" y="122">N</text>
+    <text x="440" y="122">P</text>
+  </g>
+</svg>
