@@ -4,3 +4,5 @@ dist/
 server/.env
 npm-debug.log*
 .DS_Store
+server-dev.err.log
+server-dev.out.log
