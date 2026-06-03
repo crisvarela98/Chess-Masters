@@ -43,13 +43,7 @@ function ModeCard({ icon: Icon, title, text, tone, onClick }) {
 
 export function PlayHubScreen({ onNavigate }) {
   return (
-    <main className="screen screen-flow">
-      <div className="screen-head">
-        <span className="screen-kicker">Tu siguiente jugada</span>
-        <h2 className="section-title">Jugar</h2>
-        <p className="screen-lead">Elige el modo ideal para este momento y entra directo a la accion.</p>
-      </div>
-
+    <main className="screen screen-flow play-screen">
       <section className="play-hub compact-hub">
         <div className="mode-list mode-list-premium">
           {playModes.map((mode) => (

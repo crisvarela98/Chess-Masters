@@ -2307,6 +2307,10 @@ body {
   line-height: 1.38;
 }
 
+.play-screen {
+  gap: 8px;
+}
+
 .mode-card-arrow {
   color: #d7e4ef;
 }
@@ -2414,6 +2418,40 @@ body {
   padding: 12px 14px;
 }
 
+.shop-wallet-strip-top {
+  grid-template-columns: auto repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+.shop-wallet-strip-top .back-button {
+  min-width: 0;
+  justify-content: center;
+}
+
+.shop-screen {
+  gap: 10px;
+  overflow: hidden;
+}
+
+.shop-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+  background: linear-gradient(180deg, rgba(6, 13, 21, 0.98), rgba(6, 13, 21, 0.96));
+}
+
+.shop-tabs-sticky {
+  margin-top: 0;
+}
+
+.shop-content {
+  display: grid;
+  gap: 10px;
+}
+
 .shop-row {
   gap: 12px;
   border-radius: 18px;
@@ -2456,6 +2494,78 @@ body {
   gap: 12px;
   padding: 14px;
   text-align: left;
+}
+
+.profile-screen {
+  gap: 10px;
+  overflow: hidden;
+}
+
+.profile-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.profile-main-panel,
+.profile-side-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.profile-main-panel {
+  align-content: start;
+}
+
+.profile-side-panel {
+  align-content: start;
+}
+
+.profile-side-panel .back-button {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.profile-stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profile-stats-grid span {
+  min-height: 58px;
+  padding: 10px 8px;
+  font-size: 0.94rem;
+}
+
+.profile-stats-grid span small {
+  font-size: 0.68rem;
+}
+
+.profile-avatar-section {
+  gap: 8px;
+}
+
+.avatar-grid-compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.profile-match-panel {
+  padding: 12px 14px;
+}
+
+.profile-match-panel strong {
+  font-size: 0.95rem;
+}
+
+.profile-match-panel span {
+  font-size: 0.92rem;
+}
+
+.profile-match-panel small {
+  font-size: 0.78rem;
 }
 
 .profile-hero {
@@ -2827,9 +2937,189 @@ body {
   background: linear-gradient(180deg, rgba(76, 224, 143, 0.96), rgba(42, 191, 108, 0.96));
 }
 
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.segmented-control button {
+  min-height: 42px;
+  border-radius: 14px;
+  background: rgba(16, 37, 58, 0.96);
+  color: #dce8f2;
+  font-weight: 900;
+}
+
+.segmented-control button.active {
+  background: linear-gradient(180deg, #ffd85d, #d89317);
+  color: #09111b;
+}
+
+.social-panel {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(15, 34, 53, 0.98), rgba(10, 24, 38, 0.98));
+}
+
+.social-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.social-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.social-card.favorite {
+  background: linear-gradient(180deg, rgba(240, 187, 79, 0.12), rgba(255, 255, 255, 0.04));
+}
+
+.social-card strong {
+  display: block;
+  font-size: 0.96rem;
+}
+
+.social-card small {
+  color: #adc3d3;
+  font-size: 0.76rem;
+}
+
+.social-record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.social-record span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #d8e5ef;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.social-actions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 6px;
+}
+
+.social-actions button {
+  min-height: 38px;
+}
+
+.tournament-config {
+  display: grid;
+  gap: 6px;
+}
+
+.tournament-config label {
+  display: grid;
+  gap: 5px;
+  color: #e5eef6;
+  font-size: 0.82rem;
+}
+
+.tournament-config small {
+  color: #97b0c5;
+}
+
+.tournament-roster {
+  display: grid;
+  gap: 8px;
+}
+
+.tournament-roster-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tournament-roster-head strong {
+  font-size: 0.92rem;
+}
+
+.tournament-player-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tournament-player {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.ranking-scroll {
+  max-height: 42vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
 @media (max-width: 420px) {
   .screen {
     gap: 10px;
+  }
+
+  .profile-top-grid {
+    gap: 8px;
+  }
+
+  .profile-main-panel,
+  .profile-side-panel {
+    padding: 12px;
+  }
+
+  .profile-hero {
+    gap: 10px;
+  }
+
+  .profile-hero .avatar-mark.large {
+    width: 68px;
+    height: 68px;
+  }
+
+  .profile-hero-copy h3 {
+    font-size: 1.08rem;
+  }
+
+  .profile-hero-copy strong {
+    font-size: 0.76rem;
+  }
+
+  .profile-hero-copy small {
+    font-size: 0.72rem;
+  }
+
+  .profile-stats-grid span {
+    min-height: 54px;
+    padding: 8px 6px;
+  }
+
+  .avatar-grid-compact {
+    grid-template-columns: 1fr;
   }
 
   .hero-copy h1 {
@@ -2855,6 +3145,281 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     min-width: 0;
   }
+
+  .social-card,
+  .tournament-roster-head {
+    grid-template-columns: 1fr;
+  }
+
+  .social-actions,
+  .tournament-player-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Minimal refresh */
+
+body {
+  background:
+    radial-gradient(circle at top, rgba(44, 103, 156, 0.14), transparent 18rem),
+    linear-gradient(180deg, #06111b, #040a11 66%, #02060c);
+}
+
+.app-shell {
+  background: rgba(7, 20, 34, 0.86);
+  box-shadow: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.app-shell::before {
+  opacity: 0.55;
+  height: 160px;
+}
+
+.screen {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.screen-head {
+  gap: 3px;
+}
+
+.screen-lead {
+  font-size: 0.8rem;
+  line-height: 1.38;
+  max-width: 34ch;
+}
+
+.screen-kicker {
+  min-height: 22px;
+  padding: 0 9px;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+}
+
+.section-title {
+  font-size: 1.04rem;
+}
+
+.profile-summary,
+.review-button,
+.section-card,
+.reward-card,
+.story-tournament,
+.online-panel,
+.ranking-panel,
+.profile-card,
+.history-card,
+.mini-game-card,
+.empty-review,
+.ftue-step,
+.register-panel,
+.board-shell,
+.coach-panel,
+.hero-board,
+.ad-hub,
+.play-mode-card,
+.match-player-card,
+.match-mode-pill,
+.shop-row,
+.profile-main-panel,
+.profile-side-panel,
+.profile-match-panel,
+.shop-wallet-strip,
+.ranking-podium,
+.ranking-row,
+.social-card,
+.tournament-player,
+.tournament-config,
+.private-room-banner {
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 31, 47, 0.98), rgba(10, 23, 36, 0.98));
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.profile-summary {
+  min-height: 100px;
+}
+
+.review-button,
+.back-button,
+.premium-button,
+.match-mode-pill,
+.stat-pill,
+.status-chip,
+.room-code-pill {
+  border-radius: 12px;
+}
+
+.back-button,
+.review-button,
+.premium-button {
+  min-height: 38px;
+}
+
+.premium-button {
+  padding: 0 12px;
+}
+
+.hero-board {
+  padding: 14px;
+  gap: 10px;
+}
+
+.hero-board::after {
+  opacity: 0.4;
+}
+
+.clean-hero::after {
+  opacity: 0.35;
+}
+
+.home-primary-actions {
+  gap: 8px;
+}
+
+.play-mode-card {
+  min-height: 98px;
+  padding: 12px;
+}
+
+.mode-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+}
+
+.ad-hub,
+.section-card,
+.coach-panel,
+.board-shell,
+.ranking-panel,
+.online-panel,
+.profile-card,
+.history-card,
+.mini-game-card {
+  padding: 12px;
+}
+
+.ad-reward-button {
+  min-height: 72px;
+  padding: 10px;
+}
+
+.shop-row {
+  gap: 10px;
+}
+
+.shop-copy {
+  gap: 2px;
+}
+
+.profile-top-grid {
+  gap: 8px;
+}
+
+.profile-main-panel,
+.profile-side-panel {
+  padding: 12px;
+  gap: 8px;
+}
+
+.profile-hero .avatar-mark.large {
+  width: 70px;
+  height: 70px;
+}
+
+.profile-wallet-row,
+.header-wallet,
+.shop-wallet-strip {
+  gap: 8px;
+}
+
+.profile-stats-grid span,
+.stats-grid span {
+  min-height: 54px;
+  padding: 8px 6px;
+}
+
+.avatar-grid {
+  gap: 8px;
+}
+
+.avatar-option {
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.history-grid,
+.list,
+.mode-list,
+.social-grid,
+.ranking-panel .list {
+  gap: 8px;
+}
+
+.ranking-podium {
+  min-height: 98px;
+}
+
+.ranking-row {
+  padding: 10px;
+}
+
+.match-strip {
+  gap: 6px;
+}
+
+.board-shell {
+  gap: 10px;
+}
+
+.result-overlay {
+  inset: 8px;
+  gap: 10px;
+}
+
+.coach-strip {
+  padding: 8px 10px;
+}
+
+.game-actions button {
+  min-height: 40px;
+}
+
+.toast {
+  min-width: 180px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+}
+
+.splash-screen::before {
+  opacity: 0.45;
+  filter: blur(12px);
+}
+
+.splash-screen::after {
+  opacity: 0.5;
+}
+
+.splash-core {
+  gap: 12px;
+}
+
+.splash-aura {
+  width: 260px;
+  height: 260px;
+  filter: blur(16px);
+  opacity: 0.7;
+}
+
+.splash-branding-image {
+  width: min(100%, 332px);
+  filter: drop-shadow(0 14px 28px rgba(240, 187, 79, 0.08));
 }
 
 @media (max-width: 380px) {
@@ -2875,4 +3440,432 @@ body {
   .history-reward-block {
     grid-template-columns: 1fr;
   }
+}
+
+/* Competitive minimal */
+
+body {
+  background: linear-gradient(180deg, #050b12, #03070c 70%, #020406);
+}
+
+.app-shell {
+  width: min(430px, 100%);
+  padding: 8px 8px 82px;
+  background: rgba(6, 14, 22, 0.92);
+}
+
+.app-shell::before,
+.hero-board::after,
+.clean-hero::after,
+.splash-screen::before,
+.splash-screen::after,
+.splash-aura {
+  display: none;
+}
+
+.screen {
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.screen-head {
+  gap: 2px;
+}
+
+.screen-kicker {
+  min-height: 20px;
+  padding: 0 8px;
+  background: rgba(240, 187, 79, 0.1);
+  color: #f8df9a;
+}
+
+.section-title {
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+}
+
+.screen-lead {
+  max-width: 32ch;
+  color: #9bb1c4;
+}
+
+.profile-summary,
+.review-button,
+.section-card,
+.reward-card,
+.story-tournament,
+.online-panel,
+.ranking-panel,
+.profile-card,
+.history-card,
+.mini-game-card,
+.empty-review,
+.ftue-step,
+.register-panel,
+.board-shell,
+.coach-panel,
+.hero-board,
+.ad-hub,
+.play-mode-card,
+.match-player-card,
+.match-mode-pill,
+.shop-row,
+.profile-main-panel,
+.profile-side-panel,
+.profile-match-panel,
+.shop-wallet-strip,
+.ranking-podium,
+.ranking-row,
+.social-card,
+.tournament-player,
+.tournament-config,
+.private-room-banner {
+  border-radius: 12px;
+  background: #0d1c2c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+.hero-board {
+  padding: 12px;
+  gap: 8px;
+  background: #0d1c2c;
+}
+
+.hero-copy h1 {
+  letter-spacing: -0.05em;
+}
+
+.hero-copy p {
+  color: #b8c9d8;
+}
+
+.home-primary-actions {
+  gap: 6px;
+}
+
+.premium-button,
+.back-button,
+.review-button {
+  min-height: 36px;
+}
+
+.premium-button {
+  padding: 0 11px;
+}
+
+.play-mode-card {
+  min-height: 90px;
+  padding: 11px;
+}
+
+.mode-card-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.ad-hub {
+  padding: 11px;
+  gap: 8px;
+}
+
+.ad-reward-button {
+  min-height: 68px;
+}
+
+.profile-summary {
+  min-height: 92px;
+}
+
+.profile-main-panel,
+.profile-side-panel {
+  padding: 11px;
+}
+
+.profile-hero .avatar-mark.large {
+  width: 64px;
+  height: 64px;
+}
+
+.profile-hero-copy h3 {
+  font-size: 1rem;
+}
+
+.profile-hero-copy strong {
+  font-size: 0.73rem;
+}
+
+.profile-hero-copy small {
+  font-size: 0.69rem;
+}
+
+.profile-stats-grid span,
+.stats-grid span {
+  min-height: 50px;
+}
+
+.avatar-option {
+  padding: 7px;
+}
+
+.history-card {
+  padding: 12px;
+}
+
+.ranking-podium,
+.ranking-row {
+  padding: 10px;
+}
+
+.board-shell {
+  padding: 10px;
+}
+
+.result-overlay {
+  inset: 6px;
+  padding: 12px;
+}
+
+.coach-panel {
+  padding: 12px;
+}
+
+.toast {
+  min-width: 170px;
+  padding: 9px 11px;
+}
+
+.splash-branding-image {
+  width: min(100%, 340px);
+  filter: none;
+}
+
+.splash-core {
+  gap: 0;
+}
+
+.splash-screen {
+  background: #000;
+}
+
+/* Home and online competitive pass */
+
+.home-screen {
+  gap: 7px;
+}
+
+.home-hero {
+  min-height: 0;
+}
+
+.hero-status,
+.hero-pill-row {
+  display: none;
+}
+
+.hero-copy.centered {
+  text-align: left;
+  justify-items: start;
+  width: 100%;
+}
+
+.hero-copy small {
+  display: none;
+}
+
+.hero-copy h1 {
+  font-size: 2rem;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.hero-copy p {
+  max-width: none;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.home-primary-actions {
+  width: 100%;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.home-primary-actions .premium-button {
+  min-height: 40px;
+}
+
+.ad-hub-title span {
+  display: none;
+}
+
+.ad-hub-title strong {
+  font-size: 0.9rem;
+}
+
+.compact-home-ads {
+  gap: 7px;
+}
+
+.ad-reward-button {
+  min-height: 58px;
+  border-radius: 10px;
+}
+
+.ad-button-copy {
+  gap: 0;
+}
+
+.ad-button-copy small,
+.ad-button-copy span {
+  font-size: 0.68rem;
+}
+
+.ad-button-copy strong {
+  font-size: 0.86rem;
+}
+
+.ad-button-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+.online-lobby-screen {
+  gap: 7px;
+}
+
+.online-lobby-screen > .back-button {
+  min-height: 34px;
+}
+
+.online-lobby-screen .screen-head {
+  gap: 2px;
+}
+
+.online-lobby-screen .screen-kicker,
+.online-lobby-screen .screen-lead {
+  display: none;
+}
+
+.segmented-control {
+  gap: 6px;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.segmented-control button {
+  min-height: 34px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.online-panel,
+.ranking-panel,
+.social-panel {
+  padding: 10px;
+  gap: 8px;
+}
+
+.online-headline {
+  gap: 5px;
+}
+
+.online-headline strong,
+.daily-head strong {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.daily-head span,
+.online-headline small {
+  font-size: 0.72rem;
+}
+
+.online-status-meta {
+  gap: 6px;
+}
+
+.status-chip,
+.room-code-pill {
+  min-height: 24px;
+  padding: 0 8px;
+  font-size: 0.66rem;
+}
+
+.online-cta-row {
+  gap: 7px;
+}
+
+.online-cta-row .premium-button,
+.join-submit {
+  min-height: 38px;
+}
+
+.join-room-box {
+  gap: 6px;
+}
+
+.join-row input {
+  min-height: 38px;
+}
+
+.private-room-banner,
+.matchmaking-banner {
+  padding: 8px 10px;
+  font-size: 0.72rem;
+}
+
+.ranking-top3 {
+  gap: 7px;
+}
+
+.ranking-podium {
+  min-height: 76px;
+  padding: 8px;
+}
+
+.ranking-podium strong {
+  font-size: 0.8rem;
+}
+
+.ranking-podium small,
+.ranking-podium em {
+  font-size: 0.7rem;
+}
+
+.ranking-row {
+  min-height: 52px;
+  padding: 8px;
+}
+
+.ranking-main small {
+  display: none;
+}
+
+.ranking-name-row strong {
+  font-size: 0.84rem;
+}
+
+.rank-pill,
+.ranking-score {
+  font-size: 0.72rem;
+}
+
+.ranking-scroll {
+  max-height: 38vh;
+}
+
+.splash-screen::before,
+.splash-screen::after,
+.splash-aura {
+  display: none;
+}
+
+.splash-core {
+  width: min(100%, 380px);
+  justify-items: center;
+}
+
+.splash-branding-image {
+  animation: none;
 }

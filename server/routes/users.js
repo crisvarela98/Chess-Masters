@@ -53,6 +53,7 @@ function ensureUserShape(user) {
   user.claimedLevelRewards = Array.isArray(user.claimedLevelRewards) ? user.claimedLevelRewards : [];
   user.recentMatches = Array.isArray(user.recentMatches) ? user.recentMatches : [];
   user.sessions = Array.isArray(user.sessions) ? user.sessions : [];
+  user.favoriteOpponents = Array.isArray(user.favoriteOpponents) ? user.favoriteOpponents : [];
   user.storyProgress = user.storyProgress && typeof user.storyProgress === "object" ? user.storyProgress : {};
   user.stats = {
     matches: user.stats?.matches || 0,
@@ -62,6 +63,77 @@ function ensureUserShape(user) {
     lastSessionSeconds: user.stats?.lastSessionSeconds || 0,
     totalSessions: user.stats?.totalSessions || 0
   };
+}
+
+function buildRecentOpponents(recentMatches = [], realUsernames = null) {
+  const buckets = new Map();
+
+  for (const match of recentMatches) {
+    const name = String(match.opponent || "").trim();
+    if (!name) continue;
+    const normalizedName = name.toLowerCase();
+    const canonicalName = realUsernames?.get(normalizedName) || name;
+    if (realUsernames && !realUsernames.has(normalizedName)) continue;
+    const current = buckets.get(canonicalName) || { username: canonicalName, matches: 0, wins: 0, losses: 0, draws: 0, lastPlayedAt: null };
+    current.matches += 1;
+    if (match.result === "win") current.wins += 1;
+    if (match.result === "loss") current.losses += 1;
+    if (match.result === "draw") current.draws += 1;
+    const playedAt = new Date(match.playedAt || Date.now());
+    if (!current.lastPlayedAt || playedAt > current.lastPlayedAt) {
+      current.lastPlayedAt = playedAt;
+    }
+    buckets.set(canonicalName, current);
+  }
+
+  return Array.from(buckets.values())
+    .sort((left, right) => {
+      if (right.matches !== left.matches) return right.matches - left.matches;
+      return new Date(right.lastPlayedAt || 0) - new Date(left.lastPlayedAt || 0);
+    })
+    .slice(0, 8)
+    .map((entry) => ({
+      username: entry.username,
+      matches: entry.matches,
+      wins: entry.wins,
+      losses: entry.losses,
+      draws: entry.draws,
+      lastPlayedAt: entry.lastPlayedAt
+    }));
+}
+
+function mergeRecentMatches(currentMatches = [], incomingMatches = []) {
+  const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+  const bucket = new Map();
+
+  for (const match of [...incomingMatches, ...currentMatches]) {
+    const playedAt = new Date(match.playedAt || Date.now());
+    if (Date.now() - playedAt.getTime() >= twoDaysMs) continue;
+    const key = [
+      String(match.mode || ""),
+      String(match.opponent || ""),
+      String(match.result || ""),
+      playedAt.toISOString()
+    ].join("|");
+    bucket.set(key, {
+      mode: String(match.mode || "partida"),
+      opponent: String(match.opponent || "Rival"),
+      result: match.result === "draw" ? "draw" : match.result === "win" ? "win" : "loss",
+      playedAt,
+      summary: String(match.summary || ""),
+      rewardCoins: Math.max(0, Number(match.rewardCoins) || 0),
+      rewardXp: Math.max(0, Number(match.rewardXp) || 0),
+      rewardVideoBonus: Math.max(0, Number(match.rewardVideoBonus) || 0)
+    });
+  }
+
+  return Array.from(bucket.values())
+    .sort((left, right) => new Date(right.playedAt) - new Date(left.playedAt))
+    .slice(0, 12);
+}
+
+function maxNumber(current, incoming, fallback = 0) {
+  return Math.max(Number(current) || fallback, Number(incoming) || fallback);
 }
 
 router.get("/demo", async (_req, res, next) => {
@@ -114,6 +186,133 @@ router.post("/progress", async (req, res, next) => {
   }
 });
 
+router.get("/leaderboard", async (_req, res, next) => {
+  try {
+    const users = await User.find({})
+      .select("username avatar level xp coins diamonds stats favoriteOpponents league")
+      .lean();
+
+    const ranking = users
+      .map((user) => {
+        const wins = user.stats?.wins || 0;
+        const playSeconds = user.stats?.totalPlaySeconds || 0;
+        const score = (user.level || 1) * 1800 + (user.xp || 0) + wins * 120 + Math.floor((user.coins || 0) / 40) + Math.floor(playSeconds / 30);
+        return {
+          username: user.username,
+          avatar: user.avatar || "king",
+          level: user.level || 1,
+          xp: user.xp || 0,
+          coins: user.coins || 0,
+          diamonds: user.diamonds || 0,
+          wins,
+          totalPlaySeconds: playSeconds,
+          score,
+          league: user.league || "Bronce III"
+        };
+      })
+      .sort((left, right) => right.score - left.score)
+      .slice(0, 30);
+
+    res.json({ ok: true, ranking });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/sync-profile", async (req, res, next) => {
+  try {
+    const {
+      username,
+      avatar,
+      level,
+      xp,
+      xpToNextLevel: nextLevelXp,
+      coins,
+      diamonds,
+      league,
+      stats,
+      recentMatches,
+      unlockedTactics,
+      claimedLevelRewards,
+      storyProgress
+    } = req.body;
+    const cleanUsername = String(username || "").trim();
+    if (!cleanUsername) return res.status(400).json({ message: "username faltante." });
+
+    const user = await User.findOneAndUpdate(
+      { username: cleanUsername },
+      {
+        $setOnInsert: {
+          username: cleanUsername,
+          avatar: validAvatar(avatar) ? avatar : "king",
+          coins: 5000,
+          diamonds: 15,
+          level: 1,
+          xp: 0,
+          xpToNextLevel: 500,
+          league: "Bronce III",
+          unlockedTactics: ["Horquilla"]
+        }
+      },
+      { new: true, upsert: true }
+    );
+
+    ensureUserShape(user);
+    if (validAvatar(avatar)) user.avatar = avatar;
+    user.level = maxNumber(user.level, level, 1);
+    user.xp = maxNumber(user.xp, xp, 0);
+    user.xpToNextLevel = maxNumber(user.xpToNextLevel, nextLevelXp, 500);
+    user.coins = maxNumber(user.coins, coins, 5000);
+    user.diamonds = maxNumber(user.diamonds, diamonds, 15);
+    if (league) user.league = String(league);
+
+    user.stats = {
+      ...user.stats,
+      matches: maxNumber(user.stats?.matches, stats?.matches, 0),
+      wins: maxNumber(user.stats?.wins, stats?.wins, 0),
+      streak: maxNumber(user.stats?.streak, stats?.streak, 0),
+      totalPlaySeconds: maxNumber(user.stats?.totalPlaySeconds, stats?.totalPlaySeconds, 0),
+      lastSessionSeconds: maxNumber(user.stats?.lastSessionSeconds, stats?.lastSessionSeconds, 0),
+      totalSessions: maxNumber(user.stats?.totalSessions, stats?.totalSessions, 0)
+    };
+
+    user.unlockedTactics = Array.from(new Set([...(user.unlockedTactics || []), ...((unlockedTactics || []).length ? unlockedTactics : ["Horquilla"])]));
+    user.claimedLevelRewards = Array.from(new Set([...(user.claimedLevelRewards || []), ...(claimedLevelRewards || [])]));
+    user.recentMatches = mergeRecentMatches(user.recentMatches, recentMatches || []);
+    if (storyProgress && typeof storyProgress === "object") {
+      user.storyProgress = { ...(user.storyProgress || {}), ...storyProgress };
+    }
+
+    await user.save();
+    res.json({ ok: true, user });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/social/:userId", async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.userId).select("username recentMatches favoriteOpponents");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    ensureUserShape(user);
+    const users = await User.find({ username: { $ne: user.username } }).select("username").lean();
+    const realUsernames = new Map(users.map((entry) => [String(entry.username || "").toLowerCase(), entry.username]));
+    const favoriteOpponents = (user.favoriteOpponents || [])
+      .filter((entry) => realUsernames.has(String(entry.username || "").toLowerCase()))
+      .map((entry) => ({
+        username: realUsernames.get(String(entry.username || "").toLowerCase()),
+        addedAt: entry.addedAt
+      }));
+    res.json({
+      ok: true,
+      recentOpponents: buildRecentOpponents(user.recentMatches, realUsernames),
+      favoriteOpponents
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/:userId", async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -141,12 +340,58 @@ router.post("/avatar", async (req, res, next) => {
   }
 });
 
-router.post("/record-match", async (req, res, next) => {
+router.post("/favorite-opponent", async (req, res, next) => {
   try {
-    const { userId, mode, opponent, result, summary, rewardVideoBonus = 0 } = req.body;
+    const { userId, opponent } = req.body;
+    const username = String(opponent || "").trim();
     if (!userId) return res.status(400).json({ message: "userId faltante." });
+    if (!username) return res.status(400).json({ message: "opponent faltante." });
 
     const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    ensureUserShape(user);
+
+    const exists = user.favoriteOpponents.some((item) => item.username === username);
+    if (exists) {
+      user.favoriteOpponents = user.favoriteOpponents.filter((item) => item.username !== username);
+    } else {
+      user.favoriteOpponents.unshift({ username, addedAt: new Date() });
+      user.favoriteOpponents = user.favoriteOpponents.slice(0, 12);
+    }
+
+    await user.save();
+    res.json({ ok: true, favoriteOpponents: user.favoriteOpponents });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/record-match", async (req, res, next) => {
+  try {
+    const { userId, username, avatar, mode, opponent, result, summary, rewardVideoBonus = 0 } = req.body;
+    const cleanUsername = String(username || "").trim();
+    if (!userId && !cleanUsername) return res.status(400).json({ message: "userId o username faltante." });
+
+    let user = userId ? await User.findById(userId) : null;
+    if (!user && cleanUsername) {
+      user = await User.findOneAndUpdate(
+        { username: cleanUsername },
+        {
+          $setOnInsert: {
+            username: cleanUsername,
+            avatar: validAvatar(avatar) ? avatar : "king",
+            coins: 5000,
+            diamonds: 15,
+            level: 1,
+            xp: 0,
+            xpToNextLevel: 500,
+            league: "Bronce III",
+            unlockedTactics: ["Horquilla"]
+          }
+        },
+        { new: true, upsert: true }
+      );
+    }
     if (!user) return res.status(404).json({ message: "User not found" });
     ensureUserShape(user);
 

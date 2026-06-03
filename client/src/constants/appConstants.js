@@ -1,9 +1,9 @@
 import { Home, ShoppingBag } from "lucide-react";
 
-export const FTUE_KEY = "cm_ftue_done_v2";
-export const PROFILE_KEY = "cm_profile_v2";
-export const STORY_KEY = "cm_story_progress_v2";
-export const TRAINING_KEY = "cm_training_owned_v2";
+export const FTUE_KEY = "cm_ftue_done_v3";
+export const PROFILE_KEY = "cm_profile_v3";
+export const STORY_KEY = "cm_story_progress_v3";
+export const TRAINING_KEY = "cm_training_owned_v3";
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 export const SOCKET_URL = API_URL;
 export const SPLASH_MS = 3500;

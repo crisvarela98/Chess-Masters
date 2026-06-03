@@ -1,5 +1,5 @@
 import { Chess } from "chess.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Lightbulb, Pause, ShieldAlert, Video } from "lucide-react";
 import { getCoachAdvice, pickAiMove } from "./chessCoach.js";
 
@@ -37,6 +37,11 @@ export default function ChessBoard({
   const [showOwnedMoves, setShowOwnedMoves] = useState(false);
   const [resultState, setResultState] = useState(null);
   const [doubled, setDoubled] = useState(false);
+  const resultStateRef = useRef(null);
+
+  useEffect(() => {
+    resultStateRef.current = resultState;
+  }, [resultState]);
 
   const legalTargets = useMemo(() => {
     if (!selected) return [];
@@ -44,6 +49,9 @@ export default function ChessBoard({
   }, [game, selected]);
 
   const board = game.board();
+  const displayBoard = isWhite
+    ? board
+    : [...board].reverse().map((row) => [...row].reverse());
   const coach = getCoachAdvice(game, lastMove);
   const myColor = isWhite ? "w" : "b";
   const canPlayColor = game.turn() === myColor;
@@ -61,11 +69,18 @@ export default function ChessBoard({
         tone: "draw"
       };
     }
+    if (winner === "surrender") {
+      return {
+        title: "Rendicion",
+        subtitle: "Tu rival abandono la partida. La victoria queda registrada.",
+        tone: "win"
+      };
+    }
     const playerWon = winner === (isWhite ? "white" : "black");
     return playerWon
       ? {
-          title: "Ganaste",
-          subtitle: "Buena partida. Cerraste mejor la posicion y te llevaste la victoria.",
+        title: "Ganaste",
+        subtitle: "Buena partida. Cerraste mejor la posicion y te llevaste la victoria.",
           tone: "win"
         }
       : {
@@ -124,6 +139,36 @@ export default function ChessBoard({
   }, [socket, mode, roomId, game, history]);
 
   useEffect(() => {
+    if (mode !== "online" || !socket) return undefined;
+
+    function onGameOver({ roomId: payloadRoom, result }) {
+      if (payloadRoom !== roomId || !result || resultStateRef.current) return;
+      const winner = result.winner || "draw";
+      const summary =
+        result.reason === "surrender"
+          ? "Tu rival abandono la partida."
+          : result.reason === "checkmate"
+            ? "Jaque mate."
+            : "Final online por empate.";
+
+      setSelected(null);
+      setMessage(summary);
+      setResultState({
+        ...describeResult(result.reason === "surrender" ? "surrender" : winner),
+        winner,
+        summary
+      });
+
+      if (onMatchComplete) {
+        onMatchComplete(winner, { summary });
+      }
+    }
+
+    socket.on("gameOver", onGameOver);
+    return () => socket.off("gameOver", onGameOver);
+  }, [socket, mode, roomId, onMatchComplete, isWhite]);
+
+  useEffect(() => {
     if (mode === "online" && !resultState) {
       setMessage(canPlayColor ? "Tu turno." : "Turno rival.");
     }
@@ -172,7 +217,13 @@ export default function ChessBoard({
       socket.emit("movePiece", { roomId, move: { from: played.from, to: played.to, promotion: "q" }, fen: nextGame.fen() });
       finishIfNeeded(nextGame, nextHistory);
       if (nextGame.isGameOver()) {
-        socket.emit("gameOver", { roomId, result: played.san.includes("#") ? "checkmate" : "draw" });
+        socket.emit("gameOver", {
+          roomId,
+          result: {
+            winner: played.san.includes("#") ? (nextGame.turn() === "w" ? "black" : "white") : "draw",
+            reason: played.san.includes("#") ? "checkmate" : "draw"
+          }
+        });
       }
       return;
     }
@@ -196,14 +247,20 @@ export default function ChessBoard({
 
   function handleSurrender() {
     const summary = "Abandonaste la partida antes del final.";
+    const winner = isWhite ? "black" : "white";
+    setSelected(null);
+    setMessage(summary);
     setResultState({
       title: "Rendicion",
       subtitle: "La partida se cerro por abandono. Puedes volver a intentarlo cuando quieras.",
       tone: "loss",
-      winner: isWhite ? "black" : "white",
+      winner,
       summary
     });
-    if (onMatchComplete) onMatchComplete(isWhite ? "black" : "white", { summary });
+    if (mode === "online" && socket && roomId) {
+      socket.emit("gameOver", { roomId, result: { winner, reason: "surrender" } });
+    }
+    if (onMatchComplete) onMatchComplete(winner, { summary });
     if (onSurrender) onSurrender();
   }
 
@@ -223,10 +280,12 @@ export default function ChessBoard({
 
       <div className="board-shell">
         <div className="board" aria-label="Tablero de ajedrez">
-          {board.flatMap((row, rowIndex) =>
+          {displayBoard.flatMap((row, rowIndex) =>
             row.map((piece, colIndex) => {
-              const square = squareName(rowIndex, colIndex);
-              const isDark = (rowIndex + colIndex) % 2 === 1;
+              const actualRow = isWhite ? rowIndex : 7 - rowIndex;
+              const actualCol = isWhite ? colIndex : 7 - colIndex;
+              const square = squareName(actualRow, actualCol);
+              const isDark = (actualRow + actualCol) % 2 === 1;
               const isSelected = selected === square;
               const isTarget = legalTargets.includes(square);
               const isLast = lastMove && (lastMove.from === square || lastMove.to === square);
@@ -237,8 +296,8 @@ export default function ChessBoard({
                   onClick={() => handleSquareClick(square)}
                   aria-label={square}
                 >
-                  {colIndex === 0 ? <span className={`coord coord-rank ${isDark ? "on-dark" : "on-light"}`}>{8 - rowIndex}</span> : null}
-                  {rowIndex === 7 ? <span className={`coord coord-file ${isDark ? "on-dark" : "on-light"}`}>{files[colIndex]}</span> : null}
+                  {colIndex === 0 ? <span className={`coord coord-rank ${isDark ? "on-dark" : "on-light"}`}>{8 - actualRow}</span> : null}
+                  {rowIndex === 7 ? <span className={`coord coord-file ${isDark ? "on-dark" : "on-light"}`}>{files[actualCol]}</span> : null}
                   {piece ? <span className={`piece piece-sprite ${piece.color}-${pieceTypeClass[piece.type]}`} /> : null}
                 </button>
               );

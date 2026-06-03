@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema(
     unlockedTactics: [{ type: String }],
     completedMissions: [{ type: String }],
     storyProgress: { type: mongoose.Schema.Types.Mixed, default: {} },
+    favoriteOpponents: [
+      {
+        username: { type: String, required: true },
+        addedAt: { type: Date, default: Date.now }
+      }
+    ],
     claimedLevelRewards: [{ type: Number }],
     lastDailyRewardAt: { type: Date, default: null },
     stats: {

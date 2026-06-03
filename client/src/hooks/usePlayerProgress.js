@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { player as initialPlayer } from "../data/gameData.js";
 import { applyLocalProgress, generateLevelRewards, sameUtcDay, cleanRecentMatches } from "../lib/profileUtils.js";
 import { API_URL, FTUE_KEY, PROFILE_KEY, STORY_KEY, TRAINING_KEY } from "../constants/appConstants.js";
@@ -9,6 +9,7 @@ export function usePlayerProgress({ navigateTo }) {
   const [storyProgress, setStoryProgress] = useState(() => readStorage(STORY_KEY, {}));
   const [ownedMoves, setOwnedMoves] = useState(() => readStorage(TRAINING_KEY, ["Horquilla"]));
   const [activeStoryMatch, setActiveStoryMatch] = useState(null);
+  const syncProfileRef = useRef("");
 
   useEffect(() => {
     if (profile.userId || (profile.level === 1 && profile.coins === 5000 && profile.diamonds === 15)) return;
@@ -26,6 +27,36 @@ export function usePlayerProgress({ navigateTo }) {
   useEffect(() => saveStorage(PROFILE_KEY, profile), [profile]);
   useEffect(() => saveStorage(STORY_KEY, storyProgress), [storyProgress]);
   useEffect(() => saveStorage(TRAINING_KEY, ownedMoves), [ownedMoves]);
+
+  useEffect(() => {
+    const username = String(profile.username || "").trim();
+    if (!username || username === "Jugador") return undefined;
+    if (syncProfileRef.current === username) return undefined;
+
+    syncProfileRef.current = username;
+    fetch(`${API_URL}/api/user/sync-profile`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...profile,
+        unlockedTactics: ownedMoves,
+        storyProgress
+      })
+    })
+      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok && data.user) {
+          updateProfileReward(data.user);
+          setOwnedMoves(data.user.unlockedTactics?.length ? data.user.unlockedTactics : ["Horquilla"]);
+          setStoryProgress(data.user.storyProgress || {});
+        }
+      })
+      .catch(() => {
+        syncProfileRef.current = "";
+      });
+
+    return undefined;
+  }, [profile.username]);
 
   useEffect(() => {
     if (!profile.userId) return undefined;
@@ -228,11 +259,16 @@ export function usePlayerProgress({ navigateTo }) {
       }
     }));
 
-    if (!profile.userId) return;
-    fetch(`${API_URL}/api/user/record-match`, {
+    return fetch(`${API_URL}/api/user/record-match`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: profile.userId, ...match, rewardVideoBonus: match.rewardVideoBonus || 0 })
+      body: JSON.stringify({
+        userId: profile.userId,
+        username: profile.username,
+        avatar: profile.avatar,
+        ...match,
+        rewardVideoBonus: match.rewardVideoBonus || 0
+      })
     })
       .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
       .then(({ ok, data }) => {
@@ -246,7 +282,7 @@ export function usePlayerProgress({ navigateTo }) {
           }));
         }
       })
-      .catch(() => {});
+      .catch(() => null);
   }
 
   function startStoryMatch(tournament, match) {

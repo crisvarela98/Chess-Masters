@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FTUE_KEY, SPLASH_MS, gameTips } from "./constants/appConstants.js";
+import { FTUE_KEY, PROFILE_KEY, SPLASH_MS, STORY_KEY, TRAINING_KEY, gameTips } from "./constants/appConstants.js";
 import { BackButton, BottomNav, GameTipToast, Header, SplashScreen } from "./components/AppChrome.jsx";
 import FtueScreen from "./screens/FtueScreen.jsx";
 import { HomeScreen, PlayHubScreen } from "./screens/HomeScreen.jsx";
@@ -11,7 +11,14 @@ import { useSplashScreen } from "./hooks/useSplashScreen.js";
 import { useTransientTip } from "./hooks/useTransientTip.js";
 import { usePlayerProgress } from "./hooks/usePlayerProgress.js";
 
+function resetLocalProfileFromUrl() {
+  if (!window.location.search.includes("resetLocal=1")) return;
+  [FTUE_KEY, PROFILE_KEY, STORY_KEY, TRAINING_KEY].forEach((key) => localStorage.removeItem(key));
+  window.history.replaceState({}, "", window.location.pathname);
+}
+
 export default function App() {
+  resetLocalProfileFromUrl();
   const showSplash = useSplashScreen(SPLASH_MS);
   const { activeTip, showNextTip } = useTransientTip(gameTips, 3000);
   const initialRoute = localStorage.getItem(FTUE_KEY) ? "home" : "ftue";
@@ -56,8 +63,8 @@ export default function App() {
     minigames: <MiniGameScreen />,
     online: <OnlineScreen profile={profile} onRecordMatch={recordMatch} ownedMoves={ownedMoves} onDoubleReward={(amount) => watchAdReward("coins", amount)} onReturnHome={() => navigateTo("home", { replace: true })} onBack={goBack} />,
     review: <ReviewScreen profile={profile} />,
-    profile: <ProfileScreen profile={profile} onSelectAvatar={selectAvatar} />,
-    shop: <ShopScreen profile={profile} ownedMoves={ownedMoves} onBuyMove={buyMove} />,
+    profile: <ProfileScreen profile={profile} onSelectAvatar={selectAvatar} onBack={goBack} />,
+    shop: <ShopScreen profile={profile} ownedMoves={ownedMoves} onBuyMove={buyMove} onBack={goBack} />,
     ftue: <FtueScreen onComplete={(nextProfile) => finishFtue(nextProfile, resetNavigation)} />
   }), [
     activeStoryMatch,
@@ -80,7 +87,7 @@ export default function App() {
 
   const shellHiddenRoutes = ["story-match", "online"];
   const showShell = route !== "ftue" && !shellHiddenRoutes.includes(route);
-  const showHeader = showShell && !["profile", "review"].includes(route);
+  const showHeader = showShell && !["profile", "review", "rewards", "shop"].includes(route);
 
   if (showSplash) return <SplashScreen />;
 
@@ -91,7 +98,7 @@ export default function App() {
       ) : showShell ? (
         <>
           {showHeader ? <Header profile={profile} onOpenProfile={() => navigateTo("profile")} onOpenReview={() => navigateTo("review")} onOpenTips={showNextTip} /> : null}
-          {route !== "home" ? <BackButton onBack={goBack} /> : null}
+          {route !== "home" && route !== "profile" && route !== "shop" ? <BackButton onBack={goBack} /> : null}
           <GameTipToast tip={activeTip} />
           {screens[route] || screens.home}
           <BottomNav route={route === "shop" ? "shop" : "home"} onNavigate={navigateTo} />

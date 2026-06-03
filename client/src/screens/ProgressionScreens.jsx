@@ -9,13 +9,7 @@ export function RewardsScreen({ profile, onClaimDaily, onClaimLevelReward }) {
   const [tab, setTab] = useState("daily");
 
   return (
-    <main className="screen screen-flow">
-      <div className="screen-head">
-        <span className="screen-kicker">Progreso y recursos</span>
-        <h2 className="section-title">Recompensas</h2>
-        <p className="screen-lead">Reclama lo diario y cobra cada premio importante a medida que subes de nivel.</p>
-      </div>
-
+    <main className="screen screen-flow rewards-screen">
       <div className="shop-tabs shop-tabs-tight premium-tabs">
         <button className={tab === "daily" ? "active" : ""} onClick={() => setTab("daily")}>Diarias</button>
         <button className={tab === "general" ? "active" : ""} onClick={() => setTab("general")}>Generales</button>

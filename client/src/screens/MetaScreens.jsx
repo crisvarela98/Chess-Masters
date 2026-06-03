@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Crown, Gem, Globe, Map, Palette, Gift, Search, Target, ChevronDown } from "lucide-react";
 import { avatarOptions } from "../constants/appConstants.js";
 import { cleanRecentMatches, levelProgress } from "../lib/profileUtils.js";
-import { AvatarMark, WalletPill } from "../components/AppChrome.jsx";
+import { AvatarMark, BackButton, WalletPill } from "../components/AppChrome.jsx";
 import { shopItems, tactics } from "../data/gameData.js";
 
 export function TrainingScreen({ ownedMoves, onBuyMove }) {
@@ -110,100 +110,100 @@ export function ReviewScreen({ profile }) {
   );
 }
 
-export function ProfileScreen({ profile, onSelectAvatar }) {
+export function ProfileScreen({ profile, onSelectAvatar, onBack }) {
   const latestMatch = cleanRecentMatches(profile.recentMatches || [])[0];
   const xpPercent = levelProgress(profile);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const selectedAvatar = avatarOptions.find((option) => option.id === profile.avatar);
 
   return (
-    <main className="screen screen-flow">
-      <div className="screen-head">
-        <span className="screen-kicker">Identidad del jugador</span>
-        <h2 className="section-title">Perfil</h2>
-        <p className="screen-lead">Tu progreso, tu liga online y tu configuracion visual en un solo lugar.</p>
-      </div>
-
-      <section className="profile-card">
-        <div className="profile-hero">
-          <AvatarMark avatar={profile.avatar} size="large" />
-          <div className="profile-hero-copy">
-            <h3>{profile.username}</h3>
-            <strong>Liga online: {profile.league}</strong>
-            <small>{selectedAvatar?.name || "Avatar base"} equipado</small>
-          </div>
-        </div>
-
-        <div className="profile-progress">
-          <div className="profile-progress-head">
-            <span>Progreso de nivel</span>
-            <small>{profile.xp} / {profile.xpToNextLevel} XP</small>
-          </div>
-          <div className="xp-bar">
-            <span style={{ width: `${xpPercent}%` }} />
-          </div>
-        </div>
-
-        <div className="profile-wallet-row">
-          <WalletPill type="diamonds" icon={Gem} label={profile.diamonds} />
-          <WalletPill type="coins" icon={Crown} label={profile.coins.toLocaleString("es-AR")} />
-        </div>
-
-        <div className="stats-grid">
-          <span>{profile.stats.matches}<small>Partidas</small></span>
-          <span>{profile.stats.wins}<small>Victorias</small></span>
-          <span>{profile.stats.totalSessions}<small>Sesiones</small></span>
-          <span>{profile.claimedLevelRewards?.length || 0}<small>Recompensas</small></span>
-        </div>
-
-        <div className="avatar-section">
-          <div className="avatar-section-head">
-            <strong>Avatares base</strong>
-            <small>Mas avatares van a llegar a Tienda en la parte visual.</small>
-          </div>
-          <button className={`avatar-dropdown ${showAvatarMenu ? "open" : ""}`} onClick={() => setShowAvatarMenu((prev) => !prev)}>
-            <span>{selectedAvatar ? `Elegir avatar · ${selectedAvatar.name}` : "Elegir avatar"}</span>
-            <ChevronDown size={16} />
-          </button>
-          {showAvatarMenu ? (
-            <div className="avatar-grid">
-              {avatarOptions.map((option) => (
-                <button
-                  key={option.id}
-                  className={`avatar-option ${profile.avatar === option.id ? "active" : ""}`}
-                  onClick={() => {
-                    onSelectAvatar(option.id);
-                    setShowAvatarMenu(false);
-                  }}
-                >
-                  <AvatarMark avatar={option.id} />
-                  <span>{option.name}</span>
-                </button>
-              ))}
+    <main className="screen screen-flow profile-screen">
+      <section className="profile-top-grid">
+        <article className="section-card profile-main-panel">
+          <div className="profile-hero">
+            <AvatarMark avatar={profile.avatar} size="large" />
+            <div className="profile-hero-copy">
+              <h3>{profile.username}</h3>
+              <strong>Liga online: {profile.league}</strong>
+              <small>{selectedAvatar?.name || "Avatar base"} equipado</small>
             </div>
-          ) : null}
-        </div>
+          </div>
 
-        <div className="profile-match-card">
-          <strong>Ultima partida</strong>
-          {latestMatch ? (
-            <>
-              <span>{latestMatch.result === "win" ? "Victoria" : latestMatch.result === "draw" ? "Empate" : "Derrota"} en {latestMatch.mode}</span>
-              <small>{latestMatch.opponent} - {new Date(latestMatch.playedAt).toLocaleString("es-AR")}</small>
-            </>
-          ) : (
-            <>
-              <span>Aun no tienes partidas registradas.</span>
-              <small>Juega historia u online para ver actividad aqui.</small>
-            </>
-          )}
-        </div>
+          <div className="profile-progress">
+            <div className="profile-progress-head">
+              <span>Progreso de nivel</span>
+              <small>{profile.xp} / {profile.xpToNextLevel} XP</small>
+            </div>
+            <div className="xp-bar">
+              <span style={{ width: `${xpPercent}%` }} />
+            </div>
+          </div>
+
+          <div className="profile-wallet-row">
+            <WalletPill type="diamonds" icon={Gem} label={profile.diamonds} />
+            <WalletPill type="coins" icon={Crown} label={profile.coins.toLocaleString("es-AR")} />
+          </div>
+        </article>
+
+        <article className="section-card profile-side-panel">
+          <BackButton onBack={onBack} />
+
+          <div className="stats-grid profile-stats-grid">
+            <span>{profile.stats.matches}<small>Partidas</small></span>
+            <span>{profile.stats.wins}<small>Victorias</small></span>
+            <span>{profile.stats.totalSessions}<small>Sesiones</small></span>
+            <span>{profile.claimedLevelRewards?.length || 0}<small>Recompensas</small></span>
+          </div>
+
+          <div className="avatar-section profile-avatar-section">
+            <div className="avatar-section-head">
+              <strong>Avatares base</strong>
+              <small>Mas avatares llegaran a Tienda en la parte visual.</small>
+            </div>
+            <button className={`avatar-dropdown ${showAvatarMenu ? "open" : ""}`} onClick={() => setShowAvatarMenu((prev) => !prev)}>
+              <span>{selectedAvatar ? `Elegir avatar - ${selectedAvatar.name}` : "Elegir avatar"}</span>
+              <ChevronDown size={16} />
+            </button>
+            {showAvatarMenu ? (
+              <div className="avatar-grid avatar-grid-compact">
+                {avatarOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    className={`avatar-option ${profile.avatar === option.id ? "active" : ""}`}
+                    onClick={() => {
+                      onSelectAvatar(option.id);
+                      setShowAvatarMenu(false);
+                    }}
+                  >
+                    <AvatarMark avatar={option.id} />
+                    <span>{option.name}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </article>
+      </section>
+
+      <section className="profile-match-card section-card profile-match-panel">
+        <strong>Ultima partida</strong>
+        {latestMatch ? (
+          <>
+            <span>{latestMatch.result === "win" ? "Victoria" : latestMatch.result === "draw" ? "Empate" : "Derrota"} en {latestMatch.mode}</span>
+            <small>{latestMatch.opponent} - {new Date(latestMatch.playedAt).toLocaleString("es-AR")}</small>
+          </>
+        ) : (
+          <>
+            <span>Aun no tienes partidas registradas.</span>
+            <small>Juega historia u online para ver actividad aqui.</small>
+          </>
+        )}
       </section>
     </main>
   );
 }
 
-export function ShopScreen({ profile, ownedMoves, onBuyMove }) {
+export function ShopScreen({ profile, ownedMoves, onBuyMove, onBack }) {
   const [tab, setTab] = useState("moves");
   const [toast, setToast] = useState("");
   const [highlightedItem, setHighlightedItem] = useState("");
@@ -222,26 +222,24 @@ export function ShopScreen({ profile, ownedMoves, onBuyMove }) {
   }
 
   return (
-    <main className="screen screen-flow">
+    <main className="screen screen-flow shop-screen">
       {toast ? <div className="toast success">{toast}</div> : null}
 
-      <div className="screen-head">
-        <span className="screen-kicker">Tienda premium</span>
-        <h2 className="section-title">Tienda</h2>
-        <p className="screen-lead">Compra ayudas tacticas, mejoras visuales y paquetes de recursos sin perder claridad en mobile.</p>
-      </div>
+      <section className="shop-topbar">
+        <div className="shop-wallet-strip section-card shop-wallet-strip-top">
+          <BackButton onBack={onBack} />
+          <WalletPill type="coins" icon={Crown} label={profile.coins.toLocaleString("es-AR")} />
+          <WalletPill type="diamonds" icon={Gem} label={profile.diamonds} />
+        </div>
 
-      <section className="shop-wallet-strip section-card">
-        <WalletPill type="coins" icon={Crown} label={profile.coins.toLocaleString("es-AR")} />
-        <WalletPill type="diamonds" icon={Gem} label={profile.diamonds} />
+        <div className="shop-tabs shop-tabs-tight premium-tabs shop-tabs-sticky">
+          <button className={tab === "moves" ? "active" : ""} onClick={() => setTab("moves")}>Movimientos</button>
+          <button className={tab === "visual" ? "active" : ""} onClick={() => setTab("visual")}>Parte visual</button>
+          <button className={tab === "currency" ? "active" : ""} onClick={() => setTab("currency")}>Monedas y diamantes</button>
+        </div>
       </section>
 
-      <div className="shop-tabs shop-tabs-tight premium-tabs">
-        <button className={tab === "moves" ? "active" : ""} onClick={() => setTab("moves")}>Movimientos</button>
-        <button className={tab === "visual" ? "active" : ""} onClick={() => setTab("visual")}>Parte visual</button>
-        <button className={tab === "currency" ? "active" : ""} onClick={() => setTab("currency")}>Monedas y diamantes</button>
-      </div>
-
+      <div className="shop-content">
       {tab === "moves" ? (
         <div className="list">
           {movesItems.map(([name, text, , price]) => {
@@ -342,6 +340,8 @@ export function ShopScreen({ profile, ownedMoves, onBuyMove }) {
           ))}
         </div>
       ) : null}
+      </div>
     </main>
   );
 }
+
