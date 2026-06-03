@@ -1,52 +1,78 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="160" viewBox="0 0 480 160">
   <defs>
-    <radialGradient id="whiteBase" cx="35%" cy="28%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#e4edf9" />
-    </radialGradient>
-    <radialGradient id="blackBase" cx="35%" cy="28%">
-      <stop offset="0%" stop-color="#2f4157" />
-      <stop offset="100%" stop-color="#0f1926" />
-    </radialGradient>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-color="#000000" flood-opacity="0.28" />
+    <filter id="pieceShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1.6" stdDeviation="1.8" flood-color="#000000" flood-opacity="0.28" />
     </filter>
+    <linearGradient id="whiteFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#d8d8d8" />
+    </linearGradient>
+    <linearGradient id="blackFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3e3e3e" />
+      <stop offset="100%" stop-color="#050505" />
+    </linearGradient>
     <style>
-      .glyph { font-family: Georgia, "Times New Roman", serif; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+      .piece {
+        font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Arial Unicode MS", serif;
+        font-size: 60px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+      .white-main {
+        fill: url(#whiteFill);
+        stroke: #111111;
+        stroke-width: 2.4;
+        paint-order: stroke fill;
+      }
+      .white-shine {
+        fill: #ffffff;
+        opacity: 0.52;
+      }
+      .black-main {
+        fill: url(#blackFill);
+        stroke: #d7d7d7;
+        stroke-width: 1.6;
+        paint-order: stroke fill;
+      }
+      .black-shine {
+        fill: #8f8f8f;
+        opacity: 0.32;
+      }
     </style>
   </defs>
 
-  <g filter="url(#shadow)">
-    <circle cx="40" cy="40" r="34" fill="url(#whiteBase)" />
-    <circle cx="120" cy="40" r="34" fill="url(#whiteBase)" />
-    <circle cx="200" cy="40" r="34" fill="url(#whiteBase)" />
-    <circle cx="280" cy="40" r="34" fill="url(#whiteBase)" />
-    <circle cx="360" cy="40" r="34" fill="url(#whiteBase)" />
-    <circle cx="440" cy="40" r="34" fill="url(#whiteBase)" />
+  <g filter="url(#pieceShadow)">
+    <g class="piece">
+      <text class="white-main" x="40" y="40">♔</text>
+      <text class="white-main" x="120" y="40">♕</text>
+      <text class="white-main" x="200" y="40">♖</text>
+      <text class="white-main" x="280" y="40">♗</text>
+      <text class="white-main" x="360" y="40">♘</text>
+      <text class="white-main" x="440" y="40">♙</text>
 
-    <circle cx="40" cy="120" r="34" fill="url(#blackBase)" />
-    <circle cx="120" cy="120" r="34" fill="url(#blackBase)" />
-    <circle cx="200" cy="120" r="34" fill="url(#blackBase)" />
-    <circle cx="280" cy="120" r="34" fill="url(#blackBase)" />
-    <circle cx="360" cy="120" r="34" fill="url(#blackBase)" />
-    <circle cx="440" cy="120" r="34" fill="url(#blackBase)" />
-  </g>
+      <text class="black-main" x="40" y="120">♚</text>
+      <text class="black-main" x="120" y="120">♛</text>
+      <text class="black-main" x="200" y="120">♜</text>
+      <text class="black-main" x="280" y="120">♝</text>
+      <text class="black-main" x="360" y="120">♞</text>
+      <text class="black-main" x="440" y="120">♟</text>
+    </g>
 
-  <g class="glyph" font-size="42" fill="#1c2a3a">
-    <text x="40" y="42">K</text>
-    <text x="120" y="42">Q</text>
-    <text x="200" y="42">R</text>
-    <text x="280" y="42">B</text>
-    <text x="360" y="42">N</text>
-    <text x="440" y="42">P</text>
-  </g>
+    <g class="piece" aria-hidden="true">
+      <text class="white-shine" x="38.8" y="37.6">♔</text>
+      <text class="white-shine" x="118.8" y="37.6">♕</text>
+      <text class="white-shine" x="198.8" y="37.6">♖</text>
+      <text class="white-shine" x="278.8" y="37.6">♗</text>
+      <text class="white-shine" x="358.8" y="37.6">♘</text>
+      <text class="white-shine" x="438.8" y="37.6">♙</text>
 
-  <g class="glyph" font-size="42" fill="#f2f7ff">
-    <text x="40" y="122">K</text>
-    <text x="120" y="122">Q</text>
-    <text x="200" y="122">R</text>
-    <text x="280" y="122">B</text>
-    <text x="360" y="122">N</text>
-    <text x="440" y="122">P</text>
+      <text class="black-shine" x="38.8" y="117.6">♚</text>
+      <text class="black-shine" x="118.8" y="117.6">♛</text>
+      <text class="black-shine" x="198.8" y="117.6">♜</text>
+      <text class="black-shine" x="278.8" y="117.6">♝</text>
+      <text class="black-shine" x="358.8" y="117.6">♞</text>
+      <text class="black-shine" x="438.8" y="117.6">♟</text>
+    </g>
   </g>
 </svg>

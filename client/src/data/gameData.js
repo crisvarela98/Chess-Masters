@@ -1,14 +1,16 @@
 export const player = {
-  username: "Cristian",
-  avatar: "C",
-  level: 7,
-  xp: 12450,
-  xpToNextLevel: 16000,
-  coins: 12450,
-  diamonds: 330,
-  league: "Bronce II",
-  stats: { matches: 150, wins: 68, streak: 7 },
-  tacticsUnlocked: 6
+  username: "Jugador",
+  avatar: "king",
+  level: 1,
+  xp: 0,
+  xpToNextLevel: 500,
+  coins: 5000,
+  diamonds: 15,
+  league: "Bronce III",
+  stats: { matches: 0, wins: 0, streak: 0, totalPlaySeconds: 0, lastSessionSeconds: 0, totalSessions: 0 },
+  tacticsUnlocked: 1,
+  claimedLevelRewards: [],
+  recentMatches: []
 };
 
 export const modes = [
@@ -57,17 +59,28 @@ export const miniGames = [
 ];
 
 export const shopItems = [
-  ["Bolsa de monedas", "5.000 oro", "$1.99"],
-  ["Caja de monedas", "15.000 oro", "$4.99"],
-  ["Cofre de diamantes", "250 gemas", "$2.99"],
-  ["Pack de movimientos", "Desbloquea tecnicas nuevas", "$6.99"],
-  ["Tablero Neon", "Skin visual", "$0.99"]
+  ["Consejo defensivo", "La IA te marca como salvar una pieza bajo ataque.", "moves", 1200, 0],
+  ["Sacrificio maestro", "Sugerencia para entregar material y mejorar posicion.", "moves", 2100, 0],
+  ["Final limpio", "Ayuda de IA para simplificar hacia un final favorable.", "moves", 2800, 0],
+  ["Ataque descubierto", "Activa una idea agresiva y abre lineas tacticas.", "moves", 3400, 0],
+  ["Rescate del rey", "La IA te propone una defensa urgente cuando estas apretado.", "moves", 3900, 0],
+  ["Set marmol", "Piezas mas elegantes y contrastadas.", "visual", 0, 18],
+  ["Tablero obsidiana", "Tablero premium con textura sobria.", "visual", 0, 14],
+  ["Set marfil real", "Fichas premium con acabado suave.", "visual", 0, 22],
+  ["Tablero torneo", "Look limpio y profesional para competir.", "visual", 0, 20],
+  ["Paquete 5.000 monedas", "Monedas para progresar mas rapido.", "currency", "$1.99", 5000],
+  ["Paquete 12.000 monedas", "Una bolsa grande para tienda y ayudas.", "currency", "$3.99", 12000],
+  ["Paquete 30.000 monedas", "Reserva fuerte para progresar sin freno.", "currency", "$7.99", 30000],
+  ["Paquete 15 diamantes", "Diamantes para mejoras visuales y ayudas.", "currency", "$2.99", 15],
+  ["Paquete 40 diamantes", "Mas diamantes para skins y apoyos premium.", "currency", "$5.99", 40],
+  ["Paquete elite", "25.000 monedas y 35 diamantes juntos.", "currency", "$8.99", "25000 + 35"]
 ];
 
 export const storyTournaments = [
   {
     id: "aprendiz",
     name: "Torneo de Aprendiz",
+    unlockLevel: 1,
     matches: [
       { id: 1, level: "Super facil", ai: 0 },
       { id: 2, level: "Facil", ai: 1 },
@@ -79,12 +92,85 @@ export const storyTournaments = [
   {
     id: "ascenso",
     name: "Torneo de Ascenso",
+    unlockLevel: 3,
     matches: [
       { id: 1, level: "Super facil", ai: 1 },
       { id: 2, level: "Facil", ai: 2 },
       { id: 3, level: "Normal", ai: 3 },
       { id: 4, level: "Dificil", ai: 4 },
       { id: 5, level: "Complicado", ai: 5 }
+    ]
+  },
+  {
+    id: "regional",
+    name: "Copa Regional",
+    unlockLevel: 5,
+    matches: [
+      { id: 1, level: "Facil", ai: 2 },
+      { id: 2, level: "Normal", ai: 3 },
+      { id: 3, level: "Normal", ai: 4 },
+      { id: 4, level: "Dificil", ai: 5 },
+      { id: 5, level: "Complicado", ai: 6 }
+    ]
+  },
+  {
+    id: "metropolitano",
+    name: "Abierto Metropolitano",
+    unlockLevel: 7,
+    matches: [
+      { id: 1, level: "Normal", ai: 3 },
+      { id: 2, level: "Normal", ai: 4 },
+      { id: 3, level: "Dificil", ai: 5 },
+      { id: 4, level: "Dificil", ai: 6 },
+      { id: 5, level: "Muy dificil", ai: 7 }
+    ]
+  },
+  {
+    id: "nacional",
+    name: "Campeonato Nacional",
+    unlockLevel: 9,
+    matches: [
+      { id: 1, level: "Normal", ai: 4 },
+      { id: 2, level: "Dificil", ai: 5 },
+      { id: 3, level: "Dificil", ai: 6 },
+      { id: 4, level: "Muy dificil", ai: 7 },
+      { id: 5, level: "Elite", ai: 8 }
+    ]
+  },
+  {
+    id: "continental",
+    name: "Copa Continental",
+    unlockLevel: 12,
+    matches: [
+      { id: 1, level: "Dificil", ai: 5 },
+      { id: 2, level: "Dificil", ai: 6 },
+      { id: 3, level: "Muy dificil", ai: 7 },
+      { id: 4, level: "Elite", ai: 8 },
+      { id: 5, level: "Elite", ai: 9 }
+    ]
+  },
+  {
+    id: "maestros",
+    name: "Liga de Maestros",
+    unlockLevel: 15,
+    matches: [
+      { id: 1, level: "Muy dificil", ai: 6 },
+      { id: 2, level: "Muy dificil", ai: 7 },
+      { id: 3, level: "Elite", ai: 8 },
+      { id: 4, level: "Elite", ai: 9 },
+      { id: 5, level: "Gran maestro", ai: 10 }
+    ]
+  },
+  {
+    id: "corona",
+    name: "Torneo de la Corona",
+    unlockLevel: 18,
+    matches: [
+      { id: 1, level: "Elite", ai: 7 },
+      { id: 2, level: "Elite", ai: 8 },
+      { id: 3, level: "Gran maestro", ai: 9 },
+      { id: 4, level: "Gran maestro", ai: 10 },
+      { id: 5, level: "Legendario", ai: 11 }
     ]
   }
 ];

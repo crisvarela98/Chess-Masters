@@ -21,9 +21,22 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 4000;
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+const clientUrls = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
-app.use(cors({ origin: clientUrl }));
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (clientUrls.includes(origin)) return true;
+  return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+|192\.168\.\d+\.\d+)(:\d+)?$/.test(origin);
+}
+
+function corsOrigin(origin, callback) {
+  callback(null, isAllowedOrigin(origin));
+}
+
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
@@ -38,7 +51,7 @@ app.use("/api/matches", matchRoutes);
 app.use("/api/tournaments", tournamentRoutes);
 
 const io = new Server(server, {
-  cors: { origin: clientUrl, methods: ["GET", "POST"] }
+  cors: { origin: corsOrigin, methods: ["GET", "POST"] }
 });
 
 registerGameSockets(io);

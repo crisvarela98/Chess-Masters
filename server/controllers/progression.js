@@ -7,6 +7,10 @@ export function levelFromXp(xp) {
   return level;
 }
 
+export function xpToNextLevel(level) {
+  return Math.max(500, level * 500);
+}
+
 export function rewardFor(type) {
   const rewards = {
     win: { coins: 50, xp: 100 },
